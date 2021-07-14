@@ -12,6 +12,8 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h>  // write(), read(), close()
 #include <sys/time.h>
+#include <wiringPi.h>
+#include <wiringSerial.h>
 
 enum leg_num
 {
@@ -29,6 +31,12 @@ public:
     double long_diagonal = 44;
     double short_diagonal = 22 * sqrt(3.0);
     double side = 22;
+};
+
+enum mode
+{
+    auto_attitude_mode,
+    manualMode,
 };
 
 class hexapod_body_state
@@ -159,7 +167,6 @@ void write_controler_state(controler_state *controler, js_event event)
 int main()
 {
     ////コントローラ関係
-    int fd = open("/dev/input/js0", O_NONBLOCK);
     int fd = open("/dev/input/js0", O_RDONLY);
     struct js_event event;
     controler_state *controler;
@@ -171,12 +178,43 @@ int main()
     support_polygon support_hexagon[1];
     leg_state leg[6];
 
-    /////メイン制御ループ
+    //サーボドライバに接続するための準備
+    int fd_servo = serialOpen("/dev/serial0", 115200);
+    if (fd_servo < 0)
+    {
+        printf("can not open serialport");
+    }
+
+   unsigned char servo_buff[4];
+   unsigned char servo_buff_tmp;
+    int tmp_buff;
+    /////////////////////////////////////
+    /////メイン制御ループ///////////////////
+    /////////////////////////////////////
+
     while (1)
     {
         //コントローラの値の読み込み
         read(fd, &event, sizeof(event));
         write_controler_state(controler, event);
-        
+
+        tmp_buff = 1200;
+        //900から1900までは動作確認済み
+
+        servo_buff[0] = 0xff;
+        servo_buff[1] = 16;
+        servo_buff[2] = tmp_buff >> 7;   //角度指令値の上位８ビット
+        servo_buff[3] = tmp_buff & 0x7f; //角度指令値の下位８ビット
+
+        // servo_buff[2] = 0b0010011; //角度指令値の上位８ビット
+        // servo_buff[3] = 0b1000100; //角度指令値の下位８ビット
+
+        for (int i = 0; i < 4; i++)
+        {
+            // serialPuts(fd_servo, servo_buff);
+            serialPutchar(fd_servo,servo_buff[i]);
+        }
+        usleep(100);
     }
+    return 0;
 }
