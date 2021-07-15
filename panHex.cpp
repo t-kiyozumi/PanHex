@@ -171,11 +171,12 @@ void set_joint_arg_by_inv_dynamics(leg_state tmp_leg[])
     int j = front_left;
     for (int i = 0; i <= j; i++)
     {
-
+        //座標軸を正面に向ける（進行方向＝y方向）
         if (i == front_left)
         {
+            tmp_leg[i].x = tmp_leg[i].x * cos(M_PI/6) + tmp_leg[i].y*sin(M_PI/6);
+            tmp_leg[i].x = tmp_leg[i].x * cos(M_PI/6) + tmp_leg[i].y*sin(M_PI/6);
         }
-
         tmp_leg[i].coxa_arg = atan2(tmp_leg[i].y, tmp_leg[i].x);
 
         tmp_x = tmp_leg[i].x * cos(tmp_leg[i].coxa_arg) + tmp_leg[i].y * sin(tmp_leg[i].coxa_arg) - tmp_leg[i].coxa_length;
@@ -331,9 +332,9 @@ int main()
         // leg[front_left].femur_arg = (135.0 / 180.0) * M_PI;
         // leg[front_left].tibia_arg = (135.0 / 180.0) * M_PI;
 
-        leg[front_left].x = 15;
-        leg[front_left].y = 0;
-        leg[front_left].z = -5;
+        leg[front_left].x = 0;
+        leg[front_left].y = 20.9;
+        leg[front_left].z = 0;
 
         set_joint_arg_by_inv_dynamics(leg);
         pub_encoder_bal_to_all_servo(leg);
