@@ -270,8 +270,8 @@ void def_servo_id(leg_state leg[])
     leg[middle_left].tibia_id = 5;
 
     leg[rear_left].coxa_id = 8;
-    leg[rear_left].femur_id = 9;
-    leg[rear_left].tibia_id = 7;
+    leg[rear_left].femur_id = 7;
+    leg[rear_left].tibia_id = 9;
 
     leg[front_right].coxa_id = 13;
     leg[front_right].femur_id = 15;
@@ -299,7 +299,7 @@ void pub_encoder_bal_to_all_servo(leg_state leg[])
     // モータの正負の違いもここて調節し直す
     leg[front_right].coxa_encoder_val = -1 * leg[front_right].coxa_arg * (2500 / (0.75 * M_PI)) + 2500;
     leg[front_right].femur_encoder_val = (leg[front_right].femur_arg) * (2500 / (0.75 * M_PI)) + 2500;
-    leg[front_right].tibia_encoder_val = -1 * leg[front_right].tibia_arg * (2500 / 0.75 * M_PI) + 2500;
+    leg[front_right].tibia_encoder_val = -1 * leg[front_right].tibia_arg * (2500 / (0.75 * M_PI)) + 2500;
 
     leg[front_left].coxa_encoder_val = -1 * leg[front_left].coxa_arg * (2500 / (0.75 * M_PI)) + 2500;
     leg[front_left].femur_encoder_val = leg[front_left].femur_arg * (2500 / (0.75 * M_PI)) + 2500;
@@ -312,6 +312,7 @@ void pub_encoder_bal_to_all_servo(leg_state leg[])
     leg[rear_left].coxa_encoder_val = -1 * leg[rear_left].coxa_arg * (2500 / (0.75 * M_PI)) + 2500;
     leg[rear_left].femur_encoder_val = leg[rear_left].femur_arg * (2500 / (0.75 * M_PI)) + 2500;
     leg[rear_left].tibia_encoder_val = -1 * (leg[rear_left].tibia_arg) * (2500 / (0.75 * M_PI)) + 2500;
+
     for (i = 0; i <= front_left; i++)
     {
 
@@ -428,19 +429,20 @@ int main()
         read(fd, &event, sizeof(event));
         write_controler_state(controler, event);
 
-        controll_attitude_by_yaw_pich(leg, body, support_quad, count);
-        walk_rajectory(leg, body, count);
+        // controll_attitude_by_yaw_pich(leg, body, support_quad, count);
+        // walk_rajectory(leg, body, count);
 
-        // leg[rear_right].x = 17.0;
-        // leg[rear_right].y = -14.0;
-        // leg[rear_right].z = -7.0;
+        leg[rear_left].x = -14.0;
+        leg[rear_left].y = -14.0;
+        leg[rear_left].z = -12.0;
 
         set_joint_arg_by_inv_dynamics(leg, body);
         pub_encoder_bal_to_all_servo(leg);
 
         // printf("coxa = %d , femur = %d, tibia = %d \n", leg[rear_left].coxa_encoder_val, leg[rear_left].femur_encoder_val, leg[rear_left].tibia_encoder_val);
         // printf("coxa = %d , femur = %d, tibia = %d \n", leg[front_left].coxa_encoder_val, leg[front_left].femur_encoder_val, leg[front_left].tibia_encoder_val);
-        printf("coxa = %d , femur = %d, tibia = %d \n", leg[rear_right].coxa_encoder_val, leg[rear_right].femur_encoder_val, leg[rear_right].tibia_encoder_val);
+        // printf("coxa = %d , femur = %d, tibia = %d \n", leg[rear_right].coxa_encoder_val, leg[rear_right].femur_encoder_val, leg[rear_right].tibia_encoder_val);
+        printf("coxa = %d , femur = %d, tibia = %d \n", leg[rear_left].coxa_encoder_val, leg[rear_left].femur_encoder_val, leg[rear_left].tibia_encoder_val);
 
         usleep(100);
         count++;
